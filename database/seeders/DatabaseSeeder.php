@@ -3,7 +3,9 @@
 namespace Database\Seeders;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\User;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
 {
@@ -12,11 +14,15 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // \App\Models\User::factory(10)->create();
-
-        // \App\Models\User::factory()->create([
-        //     'name' => 'Test User',
-        //     'email' => 'test@example.com',
-        // ]);
+        // Akun admin yang akan menerima notifikasi "pengguna baru" dan "pengajuan baru"
+        User::updateOrCreate(
+            ['email' => 'admin@daftarbuku.test'],
+            [
+                'name'     => 'Admin Daftar Buku',
+                'password' => Hash::make('password123'),
+                'role'     => 'admin',
+                'level'    => 'admin',
+            ]
+        );
     }
 }
