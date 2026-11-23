@@ -96,10 +96,35 @@
 
         <ul class="navbar-nav ms-auto me-3 me-lg-4">
             @auth
+            {{-- Tugas 4: Badge & Tombol Tandai Semua Dibaca pada Navbar Admin --}}
+            @if (Auth::user()?->isAdmin())
+            <li class="nav-item dropdown me-2">
+                <a class="nav-link dropdown-toggle" id="notifDropdown" href="#" role="button"
+                   data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="fas fa-bell"></i>
+                    @if (Auth::user()->unreadNotifications->count())
+                        <span class="badge bg-danger">{{ Auth::user()->unreadNotifications->count() }}</span>
+                    @endif
+                </a>
+                <div class="dropdown-menu dropdown-menu-end p-2" aria-labelledby="notifDropdown" style="min-width: 210px;">
+                    <form action="{{ route('notifikasi.baca') }}" method="POST">
+                        @csrf
+                        <button type="submit" class="btn btn-sm btn-outline-primary w-100">
+                            Tandai semua dibaca
+                        </button>
+                    </form>
+                </div>
+            </li>
+            @endif
+
             <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button"
                    data-bs-toggle="dropdown" aria-expanded="false">
-                    <i class="fas fa-user-circle me-1"></i>
+                    @if (Auth::user()->avatar)
+                        <img src="{{ Auth::user()->avatar }}" class="rounded-circle me-1" width="24" height="24" alt="avatar" referrerpolicy="no-referrer">
+                    @else
+                        <i class="fas fa-user-circle me-1"></i>
+                    @endif
                     <span class="d-none d-sm-inline">{{ Auth::user()->name }}</span>
                 </a>
 
@@ -149,7 +174,13 @@
                             Daftar Buku
                         </a>
 
-                        @if (Auth::check() && Auth::user()->level == 'admin')
+                        {{-- Latihan 1: Menu Sidebar Pengajuan Peminjaman --}}
+                        <a class="nav-link {{ request()->routeIs('peminjaman.*') ? 'active' : '' }}" href="{{ route('peminjaman.index') }}">
+                            <div class="sb-nav-link-icon"><i class="fas fa-book-reader"></i></div>
+                            Pengajuan Peminjaman
+                        </a>
+
+                        @if (Auth::check() && (Auth::user()->isAdmin() || Auth::user()->level == 'admin'))
                         <a class="nav-link {{ request()->routeIs('users.*') ? 'active' : '' }}" href="{{ route('users.index') }}">
                             <div class="sb-nav-link-icon"><i class="fas fa-users"></i></div>
                             Data User
@@ -161,7 +192,7 @@
                 <div class="sb-sidenav-footer">
                     <div class="small">Masuk sebagai:</div>
                     @auth
-                        {{ Auth::user()->name }} ({{ Auth::user()->level }})
+                        {{ Auth::user()->name }} ({{ Auth::user()->role ?? Auth::user()->level ?? 'user' }})
                     @endauth
                 </div>
             </nav>

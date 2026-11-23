@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 // Memanggil Eloquent Model 'Buku' untuk melakukan interaksi query ke database
 use App\Models\Buku;
+use Illuminate\Http\Request;
 
 class HomeController extends Controller
 {
@@ -27,13 +28,15 @@ class HomeController extends Controller
      *    mengarahkan pengguna ke halaman utama (home).
      * 2. Baris `Buku::count()` mengeksekusi query untuk menghitung
      *    total jumlah baris data yang tersimpan pada tabel `bukus`.
-     * 3. Penerapan Konsep MVC (Model-View-Controller):
+     * 3. Baris `auth()->user()->notifications()->latest()->take(10)->get()`
+     *    mengambil 10 notifikasi terbaru milik pengguna yang sedang login.
+     * 4. Penerapan Konsep MVC (Model-View-Controller):
      *    Proses perhitungan data sengaja diletakkan penuh di dalam Controller (bukan di View/Blade)
      *    agar memenuhi prinsip pemisahan tanggung jawab (*separation of concerns*). Controller
      *    bertugas mengolah dan menyiapkan data, sedangkan View (tampilan) hanya fokus menampilkan
      *    hasilnya tanpa melakukan logika pemrosesan database.
-     * 4. Pengiriman Data ke View: Metode `compact('jumlah_buku')` digunakan untuk mengirimkan
-     *    hasil perhitungan variabel `$jumlah_buku` ke dalam file tampilan `resources/views/home.blade.php`.
+     * 5. Pengiriman Data ke View: Metode `compact('jumlah_buku', 'notifikasi')` digunakan untuk
+     *    mengirimkan hasil perhitungan variabel ke dalam file tampilan `resources/views/home.blade.php`.
      *
      * @return \Illuminate\Contracts\Support\Renderable
      */
@@ -42,7 +45,20 @@ class HomeController extends Controller
         // Menghitung jumlah total baris pada tabel buku melalui Model
         $jumlah_buku = Buku::count();
 
-        // Mengirimkan hasil perhitungan ke tampilan home.blade.php
-        return view('home', compact('jumlah_buku'));
+        // Mengambil 10 notifikasi terbaru milik user yang sedang login
+        $notifikasi = auth()->user()->notifications()->latest()->take(10)->get();
+
+        // Mengirimkan hasil perhitungan dan notifikasi ke tampilan home.blade.php
+        return view('home', compact('jumlah_buku', 'notifikasi'));
+    }
+
+    /**
+     * Menandai seluruh notifikasi yang belum dibaca menjadi sudah dibaca (Tugas 4).
+     */
+    public function bacaSemua(Request $request)
+    {
+        $request->user()->unreadNotifications->markAsRead();
+
+        return back()->with('success', 'Semua notifikasi ditandai sudah dibaca.');
     }
 }
