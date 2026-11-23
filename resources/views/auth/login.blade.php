@@ -30,6 +30,13 @@
 
                             {{-- Isi Badan Kartu --}}
                             <div class="card-body">
+                                {{-- Menampilkan Alert merah jika login Google gagal, dibatalkan, atau domain ditolak --}}
+                                @if (session('error'))
+                                    <div class="alert alert-danger" role="alert">
+                                        {{ session('error') }}
+                                    </div>
+                                @endif
+
                                 {{-- Form autentikasi login yang mengarah ke route('login') --}}
                                 <form method="POST" action="{{ route('login') }}">
                                     {{-- @csrf wajib untuk mengamankan form POST dari serangan Cross-Site Request Forgery --}}
@@ -80,6 +87,14 @@
                                         <button type="submit" class="btn btn-primary px-4">Masuk</button>
                                     </div>
                                 </form>
+
+                                {{-- Pembatas dan Tombol Login dengan Google SSO --}}
+                                <div class="text-center text-muted small my-3">atau</div>
+                                <a href="{{ route('google.redirect') }}"
+                                   class="btn btn-outline-dark w-100 d-flex align-items-center justify-content-center gap-2">
+                                    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="20" alt="Google">
+                                    Login dengan Google
+                                </a>
                             </div>
 
                             {{-- Footer Kartu: Tempat menaruh link Register dan Identitas Matakuliah --}}
