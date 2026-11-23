@@ -2,7 +2,9 @@
 
 use App\Http\Controllers\BukuController;
 use App\Http\Controllers\GalleryController;
+use App\Http\Controllers\GoogleController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\PeminjamanController;
 use App\Http\Controllers\PortofolioController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Auth;
@@ -25,6 +27,12 @@ Auth::routes([
     'reset'    => false,
 ]);
 
+// Login Google SSO (Hanya untuk tamu / belum login)
+Route::middleware('guest')->group(function () {
+    Route::get('/auth/google', [GoogleController::class, 'redirect'])->name('google.redirect');
+    Route::get('/auth/google/callback', [GoogleController::class, 'callback'])->name('google.callback');
+});
+
 // =========================================================================
 // 2. RUTE NAVIGASI UTAMA & HALAMAN PUBLIK
 // =========================================================================
@@ -40,6 +48,17 @@ Route::middleware('auth')->group(function () {
 
     // Dashboard Utama
     Route::get('/home', [HomeController::class, 'index'])->name('home');
+
+    // Tugas 4: Tandai Semua Notifikasi Dibaca
+    Route::post('/notifikasi/baca-semua', [HomeController::class, 'bacaSemua'])->name('notifikasi.baca');
+
+    // ---------------------------------------------------------------------
+    // LATIHAN 1 - 4: PENGAJUAN PEMINJAMAN BUKU (PeminjamanController)
+    // ---------------------------------------------------------------------
+    Route::get('/peminjaman', [PeminjamanController::class, 'index'])->name('peminjaman.index');
+    Route::get('/peminjaman/create', [PeminjamanController::class, 'create'])->name('peminjaman.create');
+    Route::post('/peminjaman', [PeminjamanController::class, 'store'])->name('peminjaman.store');
+    Route::patch('/peminjaman/{peminjaman}/status', [PeminjamanController::class, 'updateStatus'])->name('peminjaman.status');
 
     // ---------------------------------------------------------------------
     // CRUD DATA BUKU (BukuController)
